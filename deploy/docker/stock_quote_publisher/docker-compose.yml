@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  stock-quote-publisher:
+    container_name: stock-quote-publisher
+    image: saasglue/stock_quote_publisher:v0.1
+    hostname: stock-quote-publisher
+    networks: 
+      - api_backend
+networks:
+  api_backend:
+    external: true

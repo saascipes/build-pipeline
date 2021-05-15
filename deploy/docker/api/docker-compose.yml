@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  api:
+    container_name: api
+    image: saasglue/sg_demo_buildpipeline_api:latest
+    hostname: api
+    ports:
+      - "3000:3000"
+    networks: 
+      - backend
+  client:
+    container_name: client
+    image: saasglue/sg_demo_buildpipeline_client:latest
+    hostname: client
+    ports:
+      - "8080:80"
+    networks: 
+      - backend
+    depends_on:
+      - "api"
+networks:
+  backend:
+    driver: "bridge"
