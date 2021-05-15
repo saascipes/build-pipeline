@@ -49,4 +49,5 @@
 1. ECR credentials hardcoded in ecr-auth.sh - is it even used? i don't think so - i'm removing it for now
 2. Instructions for setting up ECR
 3. Local dev environment? specific version of node and other components?
+4. They will need instructions for setting up their own version of this git repo and for creating the github action
 
