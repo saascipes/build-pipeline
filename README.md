@@ -1,7 +1,9 @@
 # SaasGlue Single Page Web App Automated Build Pipeline
 
 ## Prerequisites
-1. AWS account with EC2 ssh access and a running EC2 instance
+1. AWS account
+    - EC2 ssh access and a running EC2 instance
+    - ECR repo
 2. SaasGlue login - click [here](https://console.saasglue.com) to create a login
 
 ## Install
@@ -45,4 +47,6 @@
 
 ## TODO
 1. ECR credentials hardcoded in ecr-auth.sh - is it even used? i don't think so - i'm removing it for now
+2. Instructions for setting up ECR
+3. Local dev environment? specific version of node and other components?
 
