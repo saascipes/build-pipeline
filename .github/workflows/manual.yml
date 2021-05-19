@@ -28,7 +28,8 @@ jobs:
           method: POST
           accept: 200
           data: '{"accessKeyId": "JBIQELPNEZLH6HLICXRS","accessKeySecret": "2e97f517fc787045443e6353582ebac72b051681"}'
-      - run: echo ${{ steps.auth.outputs.data['config3'] }}
+      - run: echo ${{ steps.auth.outputs.data }}
+      - run: echo ${{ steps.auth.outputs.data.config3 }}
       - name: Run SaasGlue job
         uses: actionsflow/axios@v1
         with:
