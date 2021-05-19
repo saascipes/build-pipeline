@@ -51,7 +51,7 @@ jobs:
           # List of status codes to be accepted, else it is considerred to be failed
           accept: 201 # optional, default is 200201204
           # Headers object
-          headers: '{"_jobDefId":"60273fe2fd2b850017d478bc","_teamid":${{ steps.get-auth-outputs.outputs.teamId }},"auth":${{ steps.get-auth-outputs.outputs.token }}' # optional
+          headers: '{"_jobDefId":"60273fe2fd2b850017d478bc","_teamid":"${{ steps.get-auth-outputs.outputs.teamId }}","auth":"${{ steps.get-auth-outputs.outputs.token }}"' # optional
           # Content-Type, if data is json string, th default value will be application/json
           data: '{"runtimeVars": {"repo_name":"${{ github.event.repository.name }}"}}'
           content-type: "" # optional
