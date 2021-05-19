@@ -28,7 +28,6 @@ jobs:
           method: POST
           accept: 200
           data: '{"accessKeyId": "JBIQELPNEZLH6HLICXRS","accessKeySecret": "2e97f517fc787045443e6353582ebac72b051681"}'
-      - run: echo ${{ steps.auth.outputs.data }}
 
       - id: get-auth-outputs
         uses: actions/github-script@0.9.0
@@ -38,8 +37,6 @@ jobs:
             console.log(tokens.config3);
             core.setOutput('teamId', tokens.config3)
             core.setOutput('token', tokens.config1)
-      - run: echo "${{steps.get-auth-outputs.outputs.teamId}}"
-      - run: echo "${{steps.get-auth-outputs.outputs.token}}"
       
       - name: Run SaasGlue job
         uses: actionsflow/axios@v1
