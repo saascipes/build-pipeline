@@ -30,14 +30,16 @@ jobs:
           data: '{"accessKeyId": "JBIQELPNEZLH6HLICXRS","accessKeySecret": "2e97f517fc787045443e6353582ebac72b051681"}'
       - run: echo ${{ steps.auth.outputs.data }}
 
-      - id: get-auth-token
+      - id: get-auth-outputs
         uses: actions/github-script@0.9.0
         with:
           script: |
             const tokens = ${{ steps.auth.outputs.data }};
             console.log(tokens.config3);
             core.setOutput('teamId', tokens.config3)
-      - run: echo "${{steps.get-auth-token.outputs.token}}"
+            core.setOutput('token', tokens.config1)
+      - run: echo "${{steps.get-auth-outputs.outputs.teamId}}"
+      - run: echo "${{steps.get-auth-outputs.outputs.token}}"
       
       - name: Run SaasGlue job
         uses: actionsflow/axios@v1
@@ -49,7 +51,7 @@ jobs:
           # List of status codes to be accepted, else it is considerred to be failed
           accept: 201 # optional, default is 200201204
           # Headers object
-          headers: '{"_jobDefId":"60273fe2fd2b850017d478bc","_teamid":${{ steps.auth.outputs.data.config3 }},"auth":${{ steps.auth.outputs.data.config1 }}' # optional
+          headers: '{"_jobDefId":"60273fe2fd2b850017d478bc","_teamid":${{ steps.get-auth-outputs.outputs.teamId }},"auth":${{ steps.get-auth-outputs.outputs.token }}' # optional
           # Content-Type, if data is json string, th default value will be application/json
           data: '{"runtimeVars": {"repo_name":"${{ github.event.repository.name }}"}}'
           content-type: "" # optional
