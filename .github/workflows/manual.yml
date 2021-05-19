@@ -27,7 +27,7 @@ jobs:
           url: "https://console.saasglue.com/login/apiLogin"
           method: POST
           accept: 200
-          data: '{"accessKeyId": "JBIQELPNEZLH6HLICXRS","accessKeySecret": "2e97f517fc787045443e6353582ebac72b051681"}'
+          data: '{"accessKeyId": "${{secret.SG_ACCESS_KEY_ID}}","accessKeySecret": "${{secret.SG_ACCESS_SECRET}}"}'
 
       - id: get-auth-outputs
         uses: actions/github-script@0.9.0
