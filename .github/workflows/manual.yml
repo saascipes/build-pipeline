@@ -34,7 +34,6 @@ jobs:
         with:
           script: |
             const tokens = ${{ steps.auth.outputs.data }};
-            console.log(tokens.config3);
             core.setOutput('teamId', tokens.config3)
             core.setOutput('token', tokens.config1)
       
