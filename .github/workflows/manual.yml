@@ -34,7 +34,7 @@ jobs:
         uses: actions/github-script@0.9.0
         with:
           script: |
-            const token = "${{ steps.auth.outputs.data }}"
+            const token = ${{ steps.auth.outputs.data }}
             core.setOutput('token', token)
       - run: echo "${{steps.get-auth-token.outputs.token}}"
       
