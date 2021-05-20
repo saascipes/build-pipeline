@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-agent" {
       }
       spec {
         container {
-          image = "948032566234.dkr.ecr.us-east-1.amazonaws.com/sg_demo_buildpipeline_agent_1:${var.sg_agent_version}"
+          image = "[aws ecr repo url]/sg_demo_buildpipeline_agent_1:${var.sg_agent_version}"
           name  = "sg-demo-buildpipeline-agent"
 
           resources {

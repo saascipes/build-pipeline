@@ -35,6 +35,12 @@
             ```
             this.client.subscribe(`/exchange/${this.exchangeName}/sbp-bp-[your name]-[your birth year]`, this.onMessage.bind(this), subscribeHeaders);
             ```
+    - Modify "build_agent_docker_image_aws.sh" - replace "[aws ecr repo url]" with your aws ecr repo url
+        - Repeat for the following files:
+            - "build_api_docker_image_aws.sh"
+            - "build_stock_quote_publisher_image_aws.sh"
+            - "deploy/terraform/deploy-prod/kubernetes.tf"
+            - "deploy/terraform/deploy-test/kubernetes.tf"
     - Commit your changes and push to git
         ```
         $ git commit -m "update config"
