@@ -4,10 +4,57 @@
 1. AWS account
     - EC2 ssh access and a running EC2 instance
     - ECR repo
-2. SaasGlue login - click [here](https://console.saasglue.com) to create a login
+2. GitHub account
+3. SaasGlue account - click [here](https://console.saasglue.com) to create an account
 
 ## Install
-1. Install the SaasGlue Agent on an EC2 instance in the environment where you will host the application and run the automated build
+1. Copy the spa-build-pipeline repo to your GitHub account
+    - Clone the spa-build-pipeline repo to your local machine
+        ```
+        $ git clone --depth 1 https://github.com/saascipes/spa-build-pipeline.git
+        ```
+    - Change directories into the spa-build-pipeline folder
+        ```
+        $ cd spa-build-pipeline
+        ```
+    - Push the repo to your GitHub account
+        ```
+        $ git push --mirror https://[your github username]:[your password or access key]@github.com/[your github username]/spa-build-pipeline.git
+        ```
+2. Make configuration changes to spa-build-pipeline code
+    - Modify "config/production.json"
+        - set the "rmqBrowserPushRoute" value to something unique, e.g. "sbp-bp-[your name]-[your birth year]"
+        - set the "rmqStockQuotePublisherQueue" value to something unique, e.g. "stock-quote-publisher-[your name]-[your birth year]"
+    - Set the same values in "config/default.json" and "config/test.json"
+    - Modify "clientv1/src/utils/StompHandler.ts"
+        - Add the value you entered for "rmqBrowserPushRoute" to this line after "${this.exchangeName}/"
+            ```
+            this.client.subscribe(`/exchange/${this.exchangeName}/`, this.onMessage.bind(this), subscribeHeaders);
+            ```
+            ->
+            ```
+            this.client.subscribe(`/exchange/${this.exchangeName}/sbp-bp-[your name]-[your birth year]`, this.onMessage.bind(this), subscribeHeaders);
+            ```
+    - Commit your changes and push to git
+        ```
+        $ git commit -m "update config"
+        $ git push
+        ```
+3. Create and install SaasGlue API access credentials in GitHub
+    - Log in to the [SaasGlue web console](https://console.saasglue.com)
+    - Click your login name in the upper right hand corner and click "Access Keys"
+    - Click the "User Access Keys" tab
+    - Click "Create User Access Key"
+    - Enter a description, e.g. "GitHub access"
+    - Click "Select None"
+    - Click the checkbox next to "JOB_CREATE"
+    - Click "Create Access Key"
+    - Copy the access key secret
+    - Click the "I have copied the secret" button
+    - Copy the access key id
+    - Create a GitHub secret named "SG_ACCESS_KEY_ID" in your spa-build-pipeline repo with the SaasGlue access key id
+    - Create a GitHub secret named "SG_ACCESS_SECRET" in your spa-build-pipeline repo with the SaasGlue access key secret
+4. Install the SaasGlue Agent on an EC2 instance in the AWS environment where you will host the application and run the automated build
     - Download the linux Agent with one of these methods
         - Download from the [SaasGlue web console](https://console.saasglue.com)
             - Click the "Download Agent" link on the menu bar
@@ -16,11 +63,11 @@
         - **OR**
         - Run the python download script located in the project root directory with your Agent access key id and secret
             ```
-                python download_sg_agent.py [access key id] [access jey secret] linux
+            $ python download_sg_agent.py [access key id] [access jey secret] linux
             ```
     - Run the Agent
         ```
-        ./sg-agent-launcher
+        $ ./sg-agent-launcher
         ```
     - Create sg.cfg configuration file (see above example)
         - Add Agent access keys
@@ -30,8 +77,7 @@
             "terraform": "true"
         }
         ```
-
-2. Add your SaasGlue Agent access keys to "deploy/docker/sg-agent/sg.cfg" e.g.
+5. Add your SaasGlue Agent access keys to "deploy/docker/sg-agent/sg.cfg" e.g.
     ```
     {
         "SG_ACCESS_KEY_ID": "xxxxxxxxxxxxxxxxxxxx",
@@ -41,9 +87,16 @@
         }
     }
     ```
-    Replace the x's with your SaasGlue Agent access key id and secret. If you don't already have an Agent access key log in to the [SaasGlue web console](https://console.saasglue.com), click your login name in the upper right hand corner and click "Access Keys" from the pop-up menu.
-
-3. Import the SaasGlue Jobs
+    - Replace the x's with your SaasGlue Agent access key id and secret
+    - If you don't already have an Agent access key follow these steps to generate one:
+        - Click your login name in the upper right hand corner and click "Access Keys"
+        - Click "Create Agent Access Key"
+        - Enter a description, e.g. "Build pipeline agent"
+        - Click "Create Access Key"
+        - Copy the access key secret
+        - Click the "I have copied the secret" button
+        - Copy the access key id
+6. Import the SaasGlue Jobs
 
 ## TODO
 1. ECR credentials hardcoded in ecr-auth.sh - is it even used? i don't think so - i'm removing it for now
