@@ -138,7 +138,7 @@
     - Click "Run Job"
 
 ## TODO
-SaasGlue expoprt/import functionality
-Instructions for modifying/deploying the code to kick off the automated build process
-Instructions for running the job to tear down the build environment
-How to run the application locally
+- SaasGlue expoprt/import functionality
+- Instructions for modifying/deploying the code to kick off the automated build process
+- Instructions for running the job to tear down the build environment
+- How to run the application locally
