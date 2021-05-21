@@ -113,15 +113,24 @@
         - Copy the access key secret
         - Click the "I have copied the secret" button
         - Copy the access key id
-7. Build and deploy docker images
+7. Build the application
+    - From the project root folder run
+    ```
+    $ npm i
+    ```
+    - From the clientv1 folder run
+    ```
+    $ npm run build
+    ```
+8. Build and deploy docker images
     ```
     $ ./build_agent_docker_image_aws.sh
     $ ./build_api_docker_image_aws.sh
     $ ./build_stock_quote_publisher_image_aws.sh
     ```
-8. Import the SaasGlue Jobs (work in progress)
-9. Create Runtime Variables (instructions to come)
-10. Run the SaasGlue job to deploy the production application
+9. Import the SaasGlue Jobs (work in progress)
+10. Create Runtime Variables (instructions to come)
+11. Run the SaasGlue job to deploy the production application
     - Log in to the SaasGlue web [console](https://console.saasglue.com)
     - Click "Designer" in the menu bar
     - Select "Init Build Pipeline Demo"
@@ -132,3 +141,4 @@
 SaasGlue expoprt/import functionality
 Instructions for modifying/deploying the code to kick off the automated build process
 Instructions for running the job to tear down the build environment
+How to run the application locally
