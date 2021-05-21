@@ -1,7 +1,4 @@
 "use strict";
-/**
- * Created by richwood on 3/6/18.
- */
 Object.defineProperty(exports, "__esModule", { value: true });
 var LogLevel;
 (function (LogLevel) {

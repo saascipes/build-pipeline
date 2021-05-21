@@ -13,7 +13,6 @@ const appName = "RabbitMQPublisher";
 const amqpUrl = config.get('amqpUrl');
 const rmqVhost = config.get('rmqVhost');
 const rmqBrowserPushRoute = config.get('rmqBrowserPushRoute');
-const rmqBrowserAlertsRoute = config.get('rmqBrowserAlertsRoute');
 const rmqStockQuotePublisherQueue = config.get('rmqStockQuotePublisherQueue');
 const exch = config.get('rmqExchange');
 class RabbitMQPublisher {
@@ -33,12 +32,6 @@ class RabbitMQPublisher {
             await this.start();
         }
         this.amqp.PublishRoute(exch, rmqBrowserPushRoute, { domainType, operation, model: data, correlationId });
-    }
-    async publishBrowserAlert(message) {
-        if (!this.started) {
-            await this.start();
-        }
-        this.amqp.PublishRoute(exch, rmqBrowserAlertsRoute, { message });
     }
     async publishStockQuotesSubscriptionUpdate(data) {
         if (!this.started) {

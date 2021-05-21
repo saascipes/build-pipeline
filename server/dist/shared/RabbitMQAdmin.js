@@ -1,7 +1,4 @@
 "use strict";
-/**
- * Created by richwood on 3/15/18.
- */
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
 class RabbitMQAdmin {

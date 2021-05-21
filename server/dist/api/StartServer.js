@@ -12,7 +12,7 @@ const ErrorMiddleware_1 = require("./utils/ErrorMiddleware");
 const ResponseMiddleware_1 = require("./utils/ResponseMiddleware");
 // Create a new express application instance
 const app = express();
-const appName = 'SaasGlue Demo - Build Pipeline';
+const appName = 'SaasGlue Single Page Web App Automated Build Pipeline';
 const environment = process.env.NODE_ENV || 'development';
 var options = {
     autoIndex: false,

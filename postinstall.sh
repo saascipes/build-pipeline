@@ -3,4 +3,7 @@ npm i
 
 cd ..
 
-npm test
+if [ "$NODE_ENV" == "test" ]
+then
+    npm test
+fi

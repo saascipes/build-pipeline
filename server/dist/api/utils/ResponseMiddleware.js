@@ -22,11 +22,6 @@ function handleResponse(req, res, next) {
         }
         response.meta['correlationId'] = req.header('correlationId');
     }
-    // const hrTime: [number, number] = buildHrTime(res.getHeader(hrTimeStr));
-    // res.removeHeader(hrTimeStr);
-    // const time: [number, number] = process.hrtime(hrTime);
-    // const ms: number = Math.trunc((time[0] * 1000) + (time[1] / 1000000.0));
-    // res.header(responseTimeStr, ms.toString());
     if (response.data === undefined && response.errors === undefined && response.warnings === undefined) {
         response.statusCode = Types_1.ResponseCode.NOT_FOUND;
         res.status(response.statusCode).send({

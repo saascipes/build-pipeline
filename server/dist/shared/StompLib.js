@@ -24,7 +24,6 @@ class StompConnector {
         this.prefetchCount = prefetchCount;
         this.fnOnDisconnect = fnOnDisconnect;
         this.logger = logger;
-        // logger: SGLogger.StompLogger;
         this.activeMessages = [];
         this.lock = new AsyncLock();
         this.OnStompError = (err) => {

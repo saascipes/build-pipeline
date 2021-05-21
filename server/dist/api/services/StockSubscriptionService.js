@@ -5,17 +5,7 @@ const StockSubscription_1 = require("../domain/StockSubscription");
 const RabbitMQPublisher_1 = require("../utils/RabbitMQPublisher");
 const Errors_1 = require("../utils/Errors");
 const _ = require("lodash");
-// import { SGUtils } from '../../shared/SGUtils';
 class StockSubscriptionService {
-    // Some services might need to add additional restrictions to bulk queries
-    // This is how they would add more to the base query (Example: fetch only non-deleted users for all queries)
-    // public async updateBulkQuery(query): Promise<object> {
-    //   // modify query here
-    //   return query;
-    // }
-    // public async findAllStockSubscriptions(: string, _taskId: string, responseFields?: string) {
-    //     return StockSubscriptionModel.find({ _taskId }).select(responseFields);
-    // }
     async findAllStockSubscriptionsInternal(filter, responseFields) {
         return StockSubscription_1.StockSubscriptionModel.find(filter).select(responseFields);
     }

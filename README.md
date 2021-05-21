@@ -6,6 +6,10 @@
     - ECR repo
 2. GitHub account
 3. SaasGlue account - click [here](https://console.saasglue.com) to create an account
+4. Installed software components
+    - node version 10
+    - npm current version
+    - typescript
 
 ## Install
 1. Copy the spa-build-pipeline repo to your GitHub account
@@ -83,7 +87,14 @@
             "terraform": "true"
         }
         ```
-5. Add your SaasGlue Agent access keys to "deploy/docker/sg-agent/sg.cfg" e.g.
+5. Create AWS ECR repositories for docker images
+    - Create an ECR Registry in your AWS account
+    - Create the following ECR Repositories:
+        - sg_demo_buildpipeline_agent_1
+        - sg_demo_buildpipeline_api
+        - sg_demo_buildpipeline_client
+        - sg_demo_stock_quote_publisher
+6. Add your SaasGlue Agent access keys to "deploy/docker/sg-agent/sg.cfg" e.g.
     ```
     {
         "SG_ACCESS_KEY_ID": "xxxxxxxxxxxxxxxxxxxx",
@@ -102,11 +113,22 @@
         - Copy the access key secret
         - Click the "I have copied the secret" button
         - Copy the access key id
-6. Import the SaasGlue Jobs
+7. Build and deploy docker images
+    ```
+    $ ./build_agent_docker_image_aws.sh
+    $ ./build_api_docker_image_aws.sh
+    $ ./build_stock_quote_publisher_image_aws.sh
+    ```
+8. Import the SaasGlue Jobs (work in progress)
+9. Create Runtime Variables (instructions to come)
+10. Run the SaasGlue job to deploy the production application
+    - Log in to the SaasGlue web [console](https://console.saasglue.com)
+    - Click "Designer" in the menu bar
+    - Select "Init Build Pipeline Demo"
+    - Click the "Run" tab
+    - Click "Run Job"
 
 ## TODO
-1. ECR credentials hardcoded in ecr-auth.sh - is it even used? i don't think so - i'm removing it for now
-2. Instructions for setting up ECR
-3. Local dev environment? specific version of node and other components?
-4. They will need instructions for setting up their own version of this git repo and for creating the github action
-
+SaasGlue expoprt/import functionality
+Instructions for modifying/deploying the code to kick off the automated build process
+Instructions for running the job to tear down the build environment

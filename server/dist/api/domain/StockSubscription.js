@@ -28,23 +28,8 @@ StockSubscriptionSchema.propAliases = {
 };
 // Converters for values to/from the database.  Converter functions take the entire model
 StockSubscriptionSchema.dataConverters = {
-    // This isn't hooked up yet until needed - if it does, then call this in the controller layer on data before passing to service
-    toDB: {
-    // _originalAuthorUserId: (data) => {
-    //   return new mongodb.ObjectID(data._originalAuthorUserId);
-    // },
-    // _lastEditedUserId: (data) => {
-    //   return new mongodb.ObjectID(data._lastEditedUserId);
-    // }
-    },
-    fromDB: {
-    // _originalAuthorUserId: (data) => {
-    //   return new mongodb.ObjectID(data._originalAuthorUserId);
-    // },
-    // _lastEditedUserId: (data) => {
-    //   return new mongodb.ObjectID(data._lastEditedUserId);
-    // }
-    }
+    toDB: {},
+    fromDB: {}
 };
 __decorate([
     typegoose_1.prop(),
