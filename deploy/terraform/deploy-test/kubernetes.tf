@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-agent" {
       }
       spec {
         container {
-          image = "${var.ecrurl}/sg_demo_buildpipeline_agent_1:${var.sg_agent_version}"
+          image = "${var.ecruri}/sg_demo_buildpipeline_agent_1:${var.sg_agent_version}"
           name  = "sg-demo-buildpipeline-agent"
 
           resources {

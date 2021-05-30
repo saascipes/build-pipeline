@@ -3,4 +3,4 @@ variable "environment" {
 }
 variable "demo_id" {}
 variable "sg_agent_version" {}
-variable "ecrurl" {}
+variable "ecruri" {}
