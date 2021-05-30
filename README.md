@@ -2,16 +2,16 @@
 
 ## Prerequisites
 1. AWS account
-    - EC2 ssh access and a running EC2 instance
-    - ECR repo
 2. GitHub account
 3. SaasGlue account - click [here](https://console.saasglue.com) to create an account
-4. Installed software components
+4. Installed software components (on your dev machine)
     - node version 10
     - npm current version
     - typescript
+    - Docker for Desktop
+    - git command line tools
 
-## Install
+## Pre-workshop Setup
 1. Copy the spa-build-pipeline repo to your GitHub account
     - Clone the spa-build-pipeline repo to your local machine
         ```
@@ -25,10 +25,100 @@
         ```
         $ git push --mirror https://[your github username]:[your password or access key]@github.com/[your github username]/spa-build-pipeline.git
         ```
-2. Make configuration changes to spa-build-pipeline code
+2. AWS setup
+    - Create AWS account if you don't already have one (console.aws.amazon.com -> Sign Up)
+    - Create an IAM user - https://docs.aws.amazon.com/rekognition/latest/dg/setting-up.html
+        - This user will need access to create ec2 instances, eks clusters, vpcs, subnets, ecr repositories and security groups - you can assign the AmazonEC2FullAccess role to this user for now
+        - Create an access key
+            - Click the user name from the IAM -> Users screen
+            - Click the "Security credentials" tab
+            - Click "Create access key" (if you already have the max allowed access keys for your account it will be disabled - you can use an existing one of delete one and create a new one)
+            - Record the access key id and secret - you'll need it further on in the process
+    - Create an ec2 access key pair https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html - follow instructions under "Option 1" - you'll need the name of this key pair later on
+3. SaasGlue setup
+    - Create SaasGlue account
+        - Click [here](https://console.saasglue.com) to create an account
+        - Configure Team Vars
+            - Click "Vars" in the menu bar
+            - Enter the following team variable key/value pairs - enter the key in the left box labeled "key" and the value in the right box labeled "value" and then click the "Add Runtime Variable" button
+                - AWS_REGION = us-east-2
+                - AWS_ACCESS_KEY_ID = [the access key id you created in step 2]
+                - AWS_SECRET_ACCESS_KEY = [the associated secret access key you created in step 2]
+        - Find your team id
+            - Click your login name in the upper right hand corner and click "Settings"
+            - Copy your team id - you'll need it later on
+    - Create SaasGlue access keys
+        - Create agent download access key
+            - Log in to the SaasGlue web [console](https://console.saasglue.com)
+            - Click your login name in the upper right hand corner and click "Access Keys"
+            - Click the "User Access Keys" tab
+            - Click "Create User Access Key"
+            - Enter a description, e.g. "Agent download"
+            - Click "Select None"
+            - Click the checkbox next to "AGENT_STUB_DOWNLOAD"
+            - Click "Create Access Key"
+            - Copy the access key secret
+            - Click the "I have copied the secret" button
+            - Copy the access key id from the grid
+            - You'll need the key id/secret further on in the process
+        - Create agent access key
+            - Log in to the SaasGlue web [console](https://console.saasglue.com)
+            - Click your login name in the upper right hand corner and click "Access Keys"
+            - Click the "Agent Access Keys" tab
+            - Click "Create Agent Access Key"
+            - Enter a description, e.g. "default"
+            - Click "Create Access Key"
+            - Copy the access key secret
+            - Click the "I have copied the secret" button
+            - Copy the access key id from the grid
+            - You'll need the key id/secret further on in the process
+    - Import the SaasGlue Jobs
+        - Log in to the SaasGlue web [console](https://console.saasglue.com)
+        - Click "Designer" in the menu bar
+        - Click "Import Jobs"
+        - Click "Choose File"
+        - Select the "sg_jobs.sgj" file in the spa-build-pipeline root folder and click "Open"
+    - Configure "SPA Build Pipeline Init AWS" SaasGlue job
+        - Log in to the SaasGlue web [console](https://console.saasglue.com)
+        - Click "Designer" in the menu bar
+        - Click the name "SPA Build Pipeline Init AWS"
+        - Set up runtime variables - these are key value pairs associated with the job
+            - Click the "Runtime Variables" tab 
+            - Enter the following key/value pairs - if there is an existing runtime variable with the given key, click "unmask" and enter the new value in the input box and hit "enter" - otherwise enter the key/value pair in the input boxes at the bottom of the grid and then click "Add Runtime Variable"
+        
+                workingdir = /home/ec2-user 
+                tags = {"terraform":"true"} 
+                sgTeamId = [your team id - from previous step]
+                sgLoginUrl = https://console.saasglue.com/login/apiLogin
+                sgApiUrl = https://console.saasglue.com
+                agentDownloadAccessKeySecret = [your agent download access key secret] 
+                agentDownloadAccessKeyId = [your agent download access key id] 
+                agentAccessKeySecret = [your agent access key secret] 
+                agentAccessKeyId = [your agent access key id] 
+                VpcId = [your aws default vpc id]
+                SubnetId = [your aws subnet in the default vpc corresponding to us-east-2]
+                SecurityGroupIds = [[your aws default security group id]], e.g. ['sg-0xxxxxxxxxxxxxxxx']
+                NumInstances = 1 
+                KeyName = [aws ec2 key pair]
+                InstanceType = t3.small
+                IAMRole = None 
+                ImageId = ami-0b59bfac6be064b78
+4. Run the "SPA Build Pipeline Init AWS" SaasGlue job - this job will create an ec2 instance to run the SaasGlue agent and create the ECR repositories for the application Dockder images
+    - Log in to the SaasGlue web [console](https://console.saasglue.com)
+    - Click "Designer" in the menu bar
+    - Click the name "SPA Build Pipeline Init AWS"
+    - Click the "Run" tab
+    - Click the "Run Job" button
+    - Click the "running job" link
+    - Verify the job completes successfully - if any step in the job fails, click on the step name and then the stdout/stderr links to see what error(s) occurred
+    - Click the link under "Runtime Vars" for the "Create EC2 Instance" task - scroll to the "ec2_instance_id" - this is the instance id of the newly created ec2 instance
+    - Click the link under "Runtime Vars" for the "Create ECR Repositories" task - scroll to the "repo_uri" - this is the ECR repo uri - copy this for use later on
+    - Click "Agents" in the menu bar
+    - Verify the Agent on the new ec2 instance is connected and sending a heartbeat - you can match the Agent to the ec2 instance in AWS with the displayed ip address
+5. Make configuration changes to spa-build-pipeline code
     - Modify "config/production.json"
-        - set the "rmqBrowserPushRoute" value to something unique, e.g. "sbp-bp-[your name]-[your birth year]"
-        - set the "rmqStockQuotePublisherQueue" value to something unique, e.g. "stock-quote-publisher-[your name]-[your birth year]"
+        - set the "rmqBrowserPushRoute" value to something unique, e.g. "sbp-bp-[your name]-[your birth year]-[your birth day]"
+        - set the "rmqStockQuotePublisherQueue" value to something unique, e.g. "stock-quote-publisher-[your name]-[your birth year]-[your birth day]"
     - Set the same values in "config/default.json" and "config/test.json"
     - Modify "clientv1/src/utils/StompHandler.ts"
         - Add the value you entered for "rmqBrowserPushRoute" to this line after "${this.exchangeName}/"
@@ -37,20 +127,16 @@
             ```
             ->
             ```
-            this.client.subscribe(`/exchange/${this.exchangeName}/sbp-bp-[your name]-[your birth year]`, this.onMessage.bind(this), subscribeHeaders);
+            this.client.subscribe(`/exchange/${this.exchangeName}/sbp-bp-[your name]-[your birth year]-[your birth day]`, this.onMessage.bind(this), subscribeHeaders);
             ```
-    - Modify "build_agent_docker_image_aws.sh" - replace "[aws ecr repo url]" with your aws ecr repo url
-        - Repeat for the following files:
-            - "build_api_docker_image_aws.sh"
-            - "build_stock_quote_publisher_image_aws.sh"
-            - "deploy/terraform/deploy-prod/kubernetes.tf"
-            - "deploy/terraform/deploy-test/kubernetes.tf"
     - Commit your changes and push to git
         ```
         $ git commit -m "update config"
         $ git push
         ```
-3. Create and install SaasGlue API access credentials in GitHub
+
+## Install
+1. Create and install SaasGlue API access credentials in GitHub
     - Log in to the [SaasGlue web console](https://console.saasglue.com)
     - Click your login name in the upper right hand corner and click "Access Keys"
     - Click the "User Access Keys" tab
@@ -64,56 +150,7 @@
     - Copy the access key id
     - Create a GitHub secret named "SG_ACCESS_KEY_ID" in your spa-build-pipeline repo with the SaasGlue access key id
     - Create a GitHub secret named "SG_ACCESS_SECRET" in your spa-build-pipeline repo with the SaasGlue access key secret
-4. Install the SaasGlue Agent on an EC2 instance in the AWS environment where you will host the application and run the automated build
-    - Download the linux Agent with one of these methods
-        - Download from the [SaasGlue web console](https://console.saasglue.com)
-            - Click the "Download Agent" link on the menu bar
-            - Follow the instructions to unzip the Agent download and make it executable
-            - Copy the Agent to your EC2 instance
-        - **OR**
-        - Run the python download script located in the project root directory with your Agent access key id and secret
-            ```
-            $ python download_sg_agent.py [access key id] [access jey secret] linux
-            ```
-    - Run the Agent
-        ```
-        $ ./sg-agent-launcher
-        ```
-    - Create sg.cfg configuration file (see above example)
-        - Add Agent access keys
-        - Add tag "terraform": "true", e.g.
-        ```
-        "tags": {
-            "terraform": "true"
-        }
-        ```
-5. Create AWS ECR repositories for docker images
-    - Create an ECR Registry in your AWS account
-    - Create the following ECR Repositories:
-        - sg_demo_buildpipeline_agent_1
-        - sg_demo_buildpipeline_api
-        - sg_demo_buildpipeline_client
-        - sg_demo_stock_quote_publisher
-6. Add your SaasGlue Agent access keys to "deploy/docker/sg-agent/sg.cfg" e.g.
-    ```
-    {
-        "SG_ACCESS_KEY_ID": "xxxxxxxxxxxxxxxxxxxx",
-        "SG_ACCESS_KEY_SECRET": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "tags": {
-            "demo": "build-pipeline-1"
-        }
-    }
-    ```
-    - Replace the x's with your SaasGlue Agent access key id and secret
-    - If you don't already have an Agent access key follow these steps to generate one:
-        - Click your login name in the upper right hand corner and click "Access Keys"
-        - Click "Create Agent Access Key"
-        - Enter a description, e.g. "Build pipeline agent"
-        - Click "Create Access Key"
-        - Copy the access key secret
-        - Click the "I have copied the secret" button
-        - Copy the access key id
-7. Build the application
+2. Build the application
     - From the project root folder run
     ```
     $ npm i
@@ -122,38 +159,31 @@
     ```
     $ npm run build
     ```
-8. Build and deploy docker images
+3. Build and deploy docker images (replace [aws ecr repo uri] with your ecr url)
     ```
-    $ ./build_agent_docker_image_aws.sh
-    $ ./build_api_docker_image_aws.sh
-    $ ./build_stock_quote_publisher_image_aws.sh
+    $ ./build_agent_docker_image_aws.sh v0.1 [aws ecr repo uri]
+    $ ./build_api_docker_image_aws.sh v0.1 [aws ecr repo uri]
+    $ ./build_stock_quote_publisher_image_aws.sh v0.1 [aws ecr repo uri]
     ```
-9. Import the SaasGlue Jobs
-    - Log in to the SaasGlue web [console](https://console.saasglue.com)
-    - Click "Designer" in the menu bar
-    - Click "Import Jobs"
-    - Click "Choose File"
-    - Select the "sg_jobs.sgj" file in the root folder and click "Open"
-    - Set up runtime variables
-            - Init Build Pipeline Demo job
-                - Select the "Init Build Pipeline Demo" job in the Designer view
-                - Click the "Runtime Variables" tab
-                - Enter the following runtime variable key/value pairs - enter the key in the left box labeled "key" and the value int he right box labeled "value" and then click the "Add Runtime Variable" button
-                    - GIT_URL = [the url of your github repo containing the spa_build_pipeline code - e.g. "github.com/my-repo-name"]
-                    - GIT_USERNAME = [your github username]
-                    - GIT_PASSWORD = [the password to your github repo - this could be a personal access token]
-                    - GIT_REPO_NAME = spa_build_pipeline
-                    - instances - [the id of the ec2 instance you set up previously to run the SaasGlue Agent which will create the production/build environments, e.g. "i-035d9ea161fab5073"]
-            - Build Stock Quotes Publisher job
-                - Select the "Build Stock Quotes Publisher" job in the Designer view
-                - Click the "Runtime Variables" tab
-                - Enter the following runtime variable key/value pairs
-                    - docker_tag = v0.2
-            - Remove Build Pipeline Demo job
-                - Select the "Remove Build Pipeline Demo" job in the Designer view
-                - Click the "Runtime Variables" tab
-                - Create all of the runtime variables you created for the previous two jobs with the same values - alternatively you could create all of the runtime variables in the "Vars" tab in the menu bar instead of creating the runtimne variables in the individual job definitions.
-10. Run the SaasGlue job to deploy the production application
+4. Set SaasGlue jobs Runtime Variables
+    - These are key value pairs associated with each job 
+    - To enter runtime variables for a job, click the job name in the "Designer" view and then click the "Runtime Variables" tab - if there is an existing runtime variable with the given key, click "unmask" and enter the new value in the edit box and hit "enter" - otherwise enter the key/value pair in the edit boxes at the bottom of the grid and then click "Add Runtime Variable"
+        - Init Build Pipeline Demo job
+            GIT_URL = [the url of your github repo containing the spa_build_pipeline code - e.g. "github.com/my-repo-name"]
+            GIT_USERNAME = [your github username]
+            GIT_PASSWORD = [the password to your github repo - this could be a personal access token]
+            GIT_REPO_NAME = spa_build_pipeline
+            instances = [the id of the ec2 instance you set up previously to run the SaasGlue Agent which will create the production/build environments, e.g. i-035d9ea161fab5073]
+        - Build Stock Quotes Publisher job
+            docker_tag = v0.2
+        - Remove Build Pipeline Demo job
+            GIT_URL = [the url of your github repo containing the spa_build_pipeline code - e.g. "github.com/my-repo-name"]
+            GIT_USERNAME = [your github username]
+            GIT_PASSWORD = [the password to your github repo - this could be a personal access token]
+            GIT_REPO_NAME = spa_build_pipeline
+            instances = [the id of the ec2 instance you set up previously to run the SaasGlue Agent which will create the production/build environments, e.g. i-035d9ea161fab5073]
+            docker_tag = v0.2
+5. Run the SaasGlue job to deploy the production application
     - Log in to the SaasGlue web [console](https://console.saasglue.com)
     - Click "Designer" in the menu bar
     - Select "Init Build Pipeline Demo"
@@ -166,7 +196,7 @@
         - Copy the load balancer URl corresponding to the stock quote publisher web application
         - Paste the URL into a new browser window
         - When the page loads, enter a ticker, e.g. "IBM" in the ticker input box and then click the "Subscribe" button - you should see regular quote updates in the browser
-11. Test the build/deploy process
+6. Test the build/deploy process
     - Modify the "server/src/workers/StockQuotePublisher.py" code on your local machine
         - Comment line 258
         - Uncomment lines 260 to 262
@@ -179,7 +209,7 @@
     - Click on the "Monitor" link to the left of the "Build Stock Quotes Publisher" job with status "Running"
     - You should see 3 tasks - you can click on the task name to see details related to the running task
     - When all 3 tasks have completed, go back to your stock quote publisher web application and you should see the new weighted price (wpx) field delivered with new quotes
-12. Tear down the stock quote publisher application environment
+7. Tear down the stock quote publisher application environment
     - Open the SaasGlue web [console](https://console.saasglue.com)
     - Click "Monitor" in the menu bar
     - Click on the "Monitor" link to the left of the most recent "Build Stock Quotes Publisher" job with status "Completed"

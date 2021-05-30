@@ -162,7 +162,7 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-api" {
       }
       spec {
         container {
-          image = "[aws ecr repo url]/sg_demo_buildpipeline_api:latest"
+          image = "${var.ecrurl}/sg_demo_buildpipeline_api:latest"
           name  = "sg-demo-buildpipeline-api"
 
           port {
