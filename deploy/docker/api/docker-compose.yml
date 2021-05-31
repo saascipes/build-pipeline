@@ -2,7 +2,7 @@ version: "3.7"
 services:
   api:
     container_name: api
-    image: saasglue/sg_demo_buildpipeline_api:latest
+    image: saasglue/spa_build_pipeline_api:latest
     hostname: api
     ports:
       - "3000:3000"
@@ -10,7 +10,7 @@ services:
       - backend
   client:
     container_name: client
-    image: saasglue/sg_demo_buildpipeline_client:latest
+    image: saasglue/spa_build_pipeline_client:latest
     hostname: client
     ports:
       - "8080:80"

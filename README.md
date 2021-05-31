@@ -28,12 +28,12 @@
 2. AWS setup
     - Create AWS account if you don't already have one (console.aws.amazon.com -> Sign Up)
     - Create an IAM user - https://docs.aws.amazon.com/rekognition/latest/dg/setting-up.html
-        - This user will need access to create ec2 instances, eks clusters, vpcs, subnets, ecr repositories and security groups - you can assign the AmazonEC2FullAccess role to this user for now
+        - This user will need access to create/terminate ec2 instances, eks clusters, vpcs, subnets, ecr repositories, security groups and elastic load balancers - it might be easiest to assign the AmazonEC2FullAccess role to this user for now
         - Create an access key
             - Click the user name from the IAM -> Users screen
             - Click the "Security credentials" tab
             - Click "Create access key" (if you already have the max allowed access keys for your account it will be disabled - you can use an existing one of delete one and create a new one)
-            - Record the access key id and secret - you'll need it further on in the process
+            - Record the access key id and secret - you'll need it later on
     - Create an ec2 access key pair https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html - follow instructions under "Option 1" - you'll need the name of this key pair later on
 3. SaasGlue setup
     - Create SaasGlue account
@@ -110,8 +110,8 @@
     - Click the "Run" tab
     - Click the "Run Job" button
     - Click the "running job" link
-    - Verify the job completes successfully - if any step in the job fails, click on the step name and then the stdout/stderr links to see what error(s) occurred
-    - Click the link under "Runtime Vars" for the "Create EC2 Instance" task - scroll to the "ec2_instance_id" - this is the instance id of the newly created ec2 instance
+    - Verify the job completes successfully - if any task in the job fails, click on the task name and then the stdout/stderr links to see what error(s) occurred - Note: the "Configure EC2 Instance" task will have status "NoAgentAvailable" until the ec2 inistance created by the prior task is up and running - generally about 15 seconds but it could take longer
+    - Click the link under "Runtime Vars" for the "Create EC2 Instance" task - scroll to the "ec2_instance_id" - this is the instance id of the newly created ec2 instance - record it for later on - you can stop this ec2 instance through the AWS console - it will be started automatically when you run the SaasGlue job ("Init Build Pipeline Demo job") to deploy the application
     - Click the link under "Runtime Vars" for the "Create ECR Repositories" task - scroll to the "repo_uri" - this is the ECR repo uri - copy this for use later on
     - Click "Agents" in the menu bar
     - Verify the Agent on the new ec2 instance is connected and sending a heartbeat - you can match the Agent to the ec2 instance in AWS with the displayed ip address
@@ -159,13 +159,19 @@
     ```
     $ npm run build
     ```
-3. Build and deploy docker images (replace [aws ecr repo uri] with your ecr url)
+3. Authenticate your local Docker client to your ECR registry
+    - Log in to the AWS [console](https://us-east-2.console.aws.amazon.com)
+    - Enter "ECR" in the "Search for services..." search box at the top of the console and select "Elastic Container Registry"
+    - Select any one of the repositories (there should be 4) by clicking the radio button next to the repository name
+    - Click the "View push commands" button
+    - Follow the instructions in step 1, "Retrieve an authentication token..." - run the command from a terminal window
+4. Build and deploy docker images (replace [aws ecr repo uri] with your ecr uri)
     ```
     $ ./build_agent_docker_image_aws.sh v0.1 [aws ecr repo uri]
     $ ./build_api_docker_image_aws.sh v0.1 [aws ecr repo uri]
     $ ./build_stock_quote_publisher_image_aws.sh v0.1 [aws ecr repo uri]
     ```
-4. Set SaasGlue jobs Runtime Variables
+5. Set SaasGlue jobs Runtime Variables
     - These are key value pairs associated with each job 
     - To enter runtime variables for a job, click the job name in the "Designer" view and then click the "Runtime Variables" tab - if there is an existing runtime variable with the given key, click "unmask" and enter the new value in the edit box and hit "enter" - otherwise enter the key/value pair in the edit boxes at the bottom of the grid and then click "Add Runtime Variable"
         - Init Build Pipeline Demo job
@@ -175,6 +181,8 @@
             GIT_REPO_NAME = spa_build_pipeline
             instances = [the id of the ec2 instance you set up previously to run the SaasGlue Agent which will create the production/build environments, e.g. i-035d9ea161fab5073]
         - Build Stock Quotes Publisher job
+            GIT_REPO_NAME = spa_build_pipeline
+            ECR_REPO_URI = [aws ecr repo uri]
             docker_tag = v0.2
         - Remove Build Pipeline Demo job
             GIT_URL = [the url of your github repo containing the spa_build_pipeline code - e.g. "github.com/my-repo-name"]
@@ -183,7 +191,7 @@
             GIT_REPO_NAME = spa_build_pipeline
             instances = [the id of the ec2 instance you set up previously to run the SaasGlue Agent which will create the production/build environments, e.g. i-035d9ea161fab5073]
             docker_tag = v0.2
-5. Run the SaasGlue job to deploy the production application
+6. Run the SaasGlue job to deploy the production application
     - Log in to the SaasGlue web [console](https://console.saasglue.com)
     - Click "Designer" in the menu bar
     - Select "Init Build Pipeline Demo"
@@ -196,7 +204,7 @@
         - Copy the load balancer URl corresponding to the stock quote publisher web application
         - Paste the URL into a new browser window
         - When the page loads, enter a ticker, e.g. "IBM" in the ticker input box and then click the "Subscribe" button - you should see regular quote updates in the browser
-6. Test the build/deploy process
+7. Test the build/deploy process
     - Modify the "server/src/workers/StockQuotePublisher.py" code on your local machine
         - Comment line 258
         - Uncomment lines 260 to 262
@@ -209,7 +217,7 @@
     - Click on the "Monitor" link to the left of the "Build Stock Quotes Publisher" job with status "Running"
     - You should see 3 tasks - you can click on the task name to see details related to the running task
     - When all 3 tasks have completed, go back to your stock quote publisher web application and you should see the new weighted price (wpx) field delivered with new quotes
-7. Tear down the stock quote publisher application environment
+8. Tear down the stock quote publisher application environment
     - Open the SaasGlue web [console](https://console.saasglue.com)
     - Click "Monitor" in the menu bar
     - Click on the "Monitor" link to the left of the most recent "Build Stock Quotes Publisher" job with status "Completed"

@@ -162,7 +162,7 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-api" {
       }
       spec {
         container {
-          image = "${var.ecruri}/sg_demo_buildpipeline_api:latest"
+          image = "${var.ecruri}/spa_build_pipeline_api:latest"
           name  = "sg-demo-buildpipeline-api"
 
           port {
@@ -233,7 +233,7 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-client" {
       }
       spec {
         container {
-          image = "${var.ecruri}/sg_demo_buildpipeline_client:latest"
+          image = "${var.ecruri}/spa_build_pipeline_client:latest"
           name  = "sg-demo-buildpipeline-client"
 
           port {
@@ -284,7 +284,7 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-stock-quote-publisher" {
       }
       spec {
         container {
-          image = "${var.ecruri}/sg_demo_stock_quote_publisher:${var.stock_publisher_version}"
+          image = "${var.ecruri}/spa_stock_quote_publisher:${var.stock_publisher_version}"
           name  = "sg-demo-buildpipeline-stock-quote-publisher"
 
           port {
