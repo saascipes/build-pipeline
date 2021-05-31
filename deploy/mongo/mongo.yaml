@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: sg-demo-mongodb
-  namespace: sg-demo-build-pipeline-1-prod
+  name: spa-mongodb
+  namespace: spa-build-pipeline-1-prod
   labels:
     name: mongodb
 spec:
@@ -17,9 +17,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongodb-stateful-set
-  namespace: sg-demo-build-pipeline-1-prod
+  namespace: spa-build-pipeline-1-prod
 spec:
-  serviceName: sg-demo-mongodb
+  serviceName: spa-mongodb
   replicas: 1
   selector:
     matchLabels:

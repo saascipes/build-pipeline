@@ -45,17 +45,17 @@ provider "kubernetes" {
 }
 
 
-resource "kubernetes_namespace" "sg-demo-build-pipeline-ns" {
+resource "kubernetes_namespace" "spa-build-pipeline-ns" {
   metadata {
-    name = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-${var.demo_id}-${var.environment}"
   }
 }
 
 
-resource "kubernetes_service" "sg-demo-buildpipeline-db" {
+resource "kubernetes_service" "spa-build-pipeline-db" {
   metadata {
-    name = "sg-demo-mongodb"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-mongodb"
+    namespace = "spa-${var.demo_id}-${var.environment}"
     labels = {
       name: "mongodb"
     }
@@ -70,19 +70,19 @@ resource "kubernetes_service" "sg-demo-buildpipeline-db" {
     }
   }
   depends_on = [
-    kubernetes_namespace.sg-demo-build-pipeline-ns
+    kubernetes_namespace.spa-build-pipeline-ns
   ]
 }
 
 
-resource "kubernetes_stateful_set" "sg-demo-buildpipeline-db-ss" {
+resource "kubernetes_stateful_set" "spa-build-pipeline-db-ss" {
   metadata {
     name = "mongodb-stateful-set"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    namespace = "spa-${var.demo_id}-${var.environment}"
   }
 
   spec {
-    service_name = "sg-demo-mongodb"
+    service_name = "spa-mongodb"
     replicas = 1
     selector {
         match_labels = {
@@ -111,17 +111,17 @@ resource "kubernetes_stateful_set" "sg-demo-buildpipeline-db-ss" {
     }
   }
   depends_on = [
-    kubernetes_namespace.sg-demo-build-pipeline-ns
+    kubernetes_namespace.spa-build-pipeline-ns
   ]
 }
 
 
-resource "kubernetes_deployment" "sg-demo-buildpipeline-agent" {
+resource "kubernetes_deployment" "spa-build-pipeline-agent" {
   metadata {
-    name = "sg-demo-buildpipeline-agent-deployment"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-build-pipeline-agent-deployment"
+    namespace = "spa-${var.demo_id}-${var.environment}"
     labels = {
-      App = "sg-demo-buildpipeline-agent"
+      App = "spa-build-pipeline-agent"
     }
   }
 
@@ -129,19 +129,19 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-agent" {
     replicas = 1
     selector {
       match_labels = {
-        App = "sg-demo-buildpipeline-agent"
+        App = "spa-build-pipeline-agent"
       }
     }
     template {
       metadata {
         labels = {
-          App = "sg-demo-buildpipeline-agent"
+          App = "spa-build-pipeline-agent"
         }
       }
       spec {
         container {
           image = "${var.ecruri}/spa_build_pipeline_agent_1:${var.sg_agent_version}"
-          name  = "sg-demo-buildpipeline-agent"
+          name  = "spa-build-pipeline-agent"
 
           resources {
             limits = {

@@ -45,17 +45,17 @@ provider "kubernetes" {
 }
 
 
-resource "kubernetes_namespace" "sg-demo-build-pipeline-ns" {
+resource "kubernetes_namespace" "spa-build-pipeline-ns" {
   metadata {
-    name = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-${var.demo_id}-${var.environment}"
   }
 }
 
 
-resource "kubernetes_service" "sg-demo-buildpipeline-db" {
+resource "kubernetes_service" "spa-build-pipeline-db" {
   metadata {
-    name = "sg-demo-mongodb"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-mongodb"
+    namespace = "spa-${var.demo_id}-${var.environment}"
     labels = {
       name: "mongodb"
     }
@@ -70,19 +70,19 @@ resource "kubernetes_service" "sg-demo-buildpipeline-db" {
     }
   }
   depends_on = [
-    kubernetes_namespace.sg-demo-build-pipeline-ns
+    kubernetes_namespace.spa-build-pipeline-ns
   ]
 }
 
 
-resource "kubernetes_stateful_set" "sg-demo-buildpipeline-db-ss" {
+resource "kubernetes_stateful_set" "spa-build-pipeline-db-ss" {
   metadata {
     name = "mongodb-stateful-set"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    namespace = "spa-${var.demo_id}-${var.environment}"
   }
 
   spec {
-    service_name = "sg-demo-mongodb"
+    service_name = "spa-mongodb"
     replicas = 1
     selector {
         match_labels = {
@@ -111,19 +111,19 @@ resource "kubernetes_stateful_set" "sg-demo-buildpipeline-db-ss" {
     }
   }
   depends_on = [
-    kubernetes_namespace.sg-demo-build-pipeline-ns
+    kubernetes_namespace.spa-build-pipeline-ns
   ]
 }
 
 
-resource "kubernetes_service" "sg-demo-buildpipeline-api" {
+resource "kubernetes_service" "spa-build-pipeline-api" {
   metadata {
-    name = "sg-demo-buildpipeline-api-service"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-build-pipeline-api-service"
+    namespace = "spa-${var.demo_id}-${var.environment}"
   }
   spec {
     selector = {
-      App = kubernetes_deployment.sg-demo-buildpipeline-api.metadata.0.labels.App
+      App = kubernetes_deployment.spa-build-pipeline-api.metadata.0.labels.App
     }
     port {
       port        = 3000
@@ -133,17 +133,17 @@ resource "kubernetes_service" "sg-demo-buildpipeline-api" {
     type = "NodePort"
   }
   depends_on = [
-    kubernetes_namespace.sg-demo-build-pipeline-ns
+    kubernetes_namespace.spa-build-pipeline-ns
   ]
 }
 
 
-resource "kubernetes_deployment" "sg-demo-buildpipeline-api" {
+resource "kubernetes_deployment" "spa-build-pipeline-api" {
   metadata {
-    name = "sg-demo-buildpipeline-api-deployment"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-build-pipeline-api-deployment"
+    namespace = "spa-${var.demo_id}-${var.environment}"
     labels = {
-      App = "sg-demo-buildpipeline-api"
+      App = "spa-build-pipeline-api"
     }
   }
 
@@ -151,19 +151,19 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-api" {
     replicas = 3
     selector {
       match_labels = {
-        App = "sg-demo-buildpipeline-api"
+        App = "spa-build-pipeline-api"
       }
     }
     template {
       metadata {
         labels = {
-          App = "sg-demo-buildpipeline-api"
+          App = "spa-build-pipeline-api"
         }
       }
       spec {
         container {
           image = "${var.ecruri}/spa_build_pipeline_api:latest"
-          name  = "sg-demo-buildpipeline-api"
+          name  = "spa-build-pipeline-api"
 
           port {
             container_port = 3000 
@@ -184,20 +184,20 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-api" {
     }
   }
   depends_on = [
-    kubernetes_namespace.sg-demo-build-pipeline-ns,
-    kubernetes_stateful_set.sg-demo-buildpipeline-db-ss
+    kubernetes_namespace.spa-build-pipeline-ns,
+    kubernetes_stateful_set.spa-build-pipeline-db-ss
   ]
 }
 
 
-resource "kubernetes_service" "sg-demo-buildpipeline-client" {
+resource "kubernetes_service" "spa-build-pipeline-client" {
   metadata {
-    name = "sg-demo-buildpipeline-client-service"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-build-pipeline-client-service"
+    namespace = "spa-${var.demo_id}-${var.environment}"
   }
   spec {
     selector = {
-      App = kubernetes_deployment.sg-demo-buildpipeline-client.metadata.0.labels.App
+      App = kubernetes_deployment.spa-build-pipeline-client.metadata.0.labels.App
     }
     port {
       port        = 80
@@ -209,12 +209,12 @@ resource "kubernetes_service" "sg-demo-buildpipeline-client" {
 }
 
 
-resource "kubernetes_deployment" "sg-demo-buildpipeline-client" {
+resource "kubernetes_deployment" "spa-build-pipeline-client" {
   metadata {
-    name = "sg-demo-buildpipeline-client-deployment"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-build-pipeline-client-deployment"
+    namespace = "spa-${var.demo_id}-${var.environment}"
     labels = {
-      App = "sg-demo-buildpipeline-client"
+      App = "spa-build-pipeline-client"
     }
   }
 
@@ -222,19 +222,19 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-client" {
     replicas = 3
     selector {
       match_labels = {
-        App = "sg-demo-buildpipeline-client"
+        App = "spa-build-pipeline-client"
       }
     }
     template {
       metadata {
         labels = {
-          App = "sg-demo-buildpipeline-client"
+          App = "spa-build-pipeline-client"
         }
       }
       spec {
         container {
           image = "${var.ecruri}/spa_build_pipeline_client:latest"
-          name  = "sg-demo-buildpipeline-client"
+          name  = "spa-build-pipeline-client"
 
           port {
             container_port = 8080
@@ -255,17 +255,17 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-client" {
     }
   }
   depends_on = [
-    kubernetes_deployment.sg-demo-buildpipeline-api
+    kubernetes_deployment.spa-build-pipeline-api
   ]
 }
 
 
-resource "kubernetes_deployment" "sg-demo-buildpipeline-stock-quote-publisher" {
+resource "kubernetes_deployment" "spa-build-pipeline-stock-quote-publisher" {
   metadata {
-    name = "sg-demo-buildpipeline-stock-quote-publisher-deployment"
-    namespace = "sg-demo-${var.demo_id}-${var.environment}"
+    name = "spa-build-pipeline-stock-quote-publisher-deployment"
+    namespace = "spa-${var.demo_id}-${var.environment}"
     labels = {
-      App = "sg-demo-buildpipeline-stock-quote-publisher"
+      App = "spa-build-pipeline-stock-quote-publisher"
     }
   }
 
@@ -273,19 +273,19 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-stock-quote-publisher" {
     replicas = 1
     selector {
       match_labels = {
-        App = "sg-demo-buildpipeline-stock-quote-publisher"
+        App = "spa-build-pipeline-stock-quote-publisher"
       }
     }
     template {
       metadata {
         labels = {
-          App = "sg-demo-buildpipeline-stock-quote-publisher"
+          App = "spa-build-pipeline-stock-quote-publisher"
         }
       }
       spec {
         container {
           image = "${var.ecruri}/spa_stock_quote_publisher:${var.stock_publisher_version}"
-          name  = "sg-demo-buildpipeline-stock-quote-publisher"
+          name  = "spa-build-pipeline-stock-quote-publisher"
 
           port {
             container_port = 8080
@@ -306,6 +306,6 @@ resource "kubernetes_deployment" "sg-demo-buildpipeline-stock-quote-publisher" {
     }
   }
   depends_on = [
-    kubernetes_deployment.sg-demo-buildpipeline-api
+    kubernetes_deployment.spa-build-pipeline-api
   ]
 }

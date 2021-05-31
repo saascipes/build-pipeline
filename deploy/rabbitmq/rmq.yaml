@@ -3,14 +3,14 @@ kind: Service
 metadata:
   creationTimestamp: "2020-12-08T15:45:14Z"
   labels:
-    app.kubernetes.io/instance: sg-demo-rmq
+    app.kubernetes.io/instance: spa-rmq
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rabbitmq
     helm.sh/chart: rabbitmq-8.4.1
-  name: sg-demo-rmq
-  namespace: sg-demo-build-pipeline-1-prod
+  name: spa-rmq
+  namespace: spa-build-pipeline-1-prod
   resourceVersion: "35709598"
-  selfLink: /api/v1/namespaces/sg-demo-build-pipeline-1-prod/services/inc-rabbitmq
+  selfLink: /api/v1/namespaces/spa-build-pipeline-1-prod/services/inc-rabbitmq
   uid: dcc694f9-f185-4abb-97a1-a8efe5469577
 spec:
   externalTrafficPolicy: Cluster
@@ -36,7 +36,7 @@ spec:
     protocol: TCP
     targetPort: stats
   selector:
-    app.kubernetes.io/instance: sg-demo-rmq
+    app.kubernetes.io/instance: spa-rmq
     app.kubernetes.io/name: rabbitmq
   sessionAffinity: None
   type: NodePort
