@@ -71,7 +71,7 @@ class StompHandler {
       "x-queue-name": `${this.queName}-${Math.random().toFixed(5).substring(2)}`
     };
 
-    this.client.subscribe(`/exchange/${this.exchangeName}/`, this.onMessage.bind(this), subscribeHeaders);
+    this.client.subscribe(`/exchange/${this.exchangeName}/bp`, this.onMessage.bind(this), subscribeHeaders);
   }
 
   

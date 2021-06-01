@@ -117,7 +117,7 @@
                 InstanceType = t3.small
                 IAMRole = [the name of the iam user you created in step 2] 
                 ImageId = ami-0b59bfac6be064b78
-4. Run the "SPA Build Pipeline Init AWS" SaasGlue job - this job will create an ec2 instance to run the SaasGlue agent and create the ECR repositories for the application Dockder images
+4. Run the "SPA Build Pipeline Init AWS" SaasGlue job - this job will create an ec2 instance to run the SaasGlue agent and create the ECR repositories for the application Docker images
     - Log in to the SaasGlue web [console](https://console.saasglue.com)
     - Click "Designer" in the menu bar
     - Click the name "SPA Build Pipeline Init AWS"
@@ -137,6 +137,15 @@
     - Modify "clientv1/.env.production"
         - Set the "VUE_APP_RABBITMQ_QUEUE" value to the same value you used for "rmqBrowserPushRoute" in the prior step
     - Set the same value in "clientv1/.env.development"
+    - Modify "clientv1/src/utils/StompHandler.ts"
+        - Add the value you entered for "rmqBrowserPushRoute" to this line after "${this.exchangeName}/"
+            ```
+            this.client.subscribe(`/exchange/${this.exchangeName}/`, this.onMessage.bind(this), subscribeHeaders);
+            ```
+            ->
+            ```
+            this.client.subscribe(`/exchange/${this.exchangeName}/sbp-bp-[your name]-[your birth year]-[your birth day]`, this.onMessage.bind(this), subscribeHeaders);
+            ```
     - Commit your changes and push to git
         ```
         $ git commit -m "update config"
