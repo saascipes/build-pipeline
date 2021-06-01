@@ -140,7 +140,7 @@
     - Modify "clientv1/src/utils/StompHandler.ts"
         - Add the value you entered for "rmqBrowserPushRoute" to this line after "${this.exchangeName}/"
             ```
-            this.client.subscribe(`/exchange/${this.exchangeName}/`, this.onMessage.bind(this), subscribeHeaders);
+            this.client.subscribe(`/exchange/${this.exchangeName}/bp`, this.onMessage.bind(this), subscribeHeaders);
             ```
             ->
             ```
