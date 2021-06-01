@@ -42,8 +42,8 @@ export const startApp = function(){
     login: process.env.VUE_APP_RABBITMQ_USER, // login
     passcode: process.env.VUE_APP_RABBITMQ_PASS, // passcode
     vHost: process.env.VUE_APP_RABBITMQ_VHOST, // vHost
-    exchangeName: 'demo', // exchangeName
-    queueName: 'demo' // queueName
+    exchangeName: 'spa-build-pipeline', // exchangeName
+    queueName: process.env.VUE_APP_RABBITMQ_QUEUE // queueName
   };
 
   const stompHandler = initStompHandler( stompOptions );

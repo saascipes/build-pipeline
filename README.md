@@ -27,13 +27,27 @@
         ```
 2. AWS setup
     - Create AWS account if you don't already have one (console.aws.amazon.com -> Sign Up)
-    - Create an IAM user - https://docs.aws.amazon.com/rekognition/latest/dg/setting-up.html
-        - This user will need access to create/terminate ec2 instances, eks clusters, vpcs, subnets, ecr repositories, security groups and elastic load balancers - it might be easiest to assign the AmazonEC2FullAccess role to this user for now
+    - Create an IAM policy named "ec2-admin-passrole" (see end for json to use to create this policy) - https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_managed-policies.html#step1-create-policy
+    - Create an IAM policy named "eks-admin" (see end for json to use to create the policy) - https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_managed-policies.html#step1-create-policy
+    - Create an IAM user (pick whatever name you want) - https://docs.aws.amazon.com/rekognition/latest/dg/setting-up.html
+        - Assign permissions to the user
+            - Attach the ec2-admin policy you created previously
+            - Attach "AmazonEC2FullAccess" AWS managed policy
+            - Attach "AmazonS3FullAccess" AWS managed policy
         - Create an access key
             - Click the user name from the IAM -> Users screen
             - Click the "Security credentials" tab
             - Click "Create access key" (if you already have the max allowed access keys for your account it will be disabled - you can use an existing one of delete one and create a new one)
             - Record the access key id and secret - you'll need it later on
+    - Create an IAM role named "eks-admin" and attach the eks-admin policy you created previously
+        - Open https://console.aws.amazon.com/iam/ in your browser
+        - Select "Roles" from the left side menu
+        - Click "Create role"
+        - Click any of the common use cases, e.g. "EC2" and then click "Next: Permissions"
+        - In the search box next to "Filter policies" type "eks-admin" and click the check box next to "eks-admin" in the list
+        - Click "Next: Tags"
+        - Click "Next: Review"
+        - Click "Create role"
     - Create an ec2 access key pair https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html - follow instructions under "Option 1" - you'll need the name of this key pair later on
 3. SaasGlue setup
     - Create SaasGlue account
@@ -117,18 +131,12 @@
     - Verify the Agent on the new ec2 instance is connected and sending a heartbeat - you can match the Agent to the ec2 instance in AWS with the displayed ip address
 5. Make configuration changes to spa-build-pipeline code
     - Modify "config/production.json"
-        - set the "rmqBrowserPushRoute" value to something unique, e.g. "sbp-bp-[your name]-[your birth year]-[your birth day]"
-        - set the "rmqStockQuotePublisherQueue" value to something unique, e.g. "stock-quote-publisher-[your name]-[your birth year]-[your birth day]"
+        - Set the "rmqBrowserPushRoute" value to something unique, e.g. "sbp-bp-[your name]-[your birth year]-[your birth day]"
+        - Set the "rmqStockQuotePublisherQueue" value to something unique, e.g. "stock-quote-publisher-[your name]-[your birth year]-[your birth day]"
     - Set the same values in "config/default.json" and "config/test.json"
-    - Modify "clientv1/src/utils/StompHandler.ts"
-        - Add the value you entered for "rmqBrowserPushRoute" to this line after "${this.exchangeName}/"
-            ```
-            this.client.subscribe(`/exchange/${this.exchangeName}/`, this.onMessage.bind(this), subscribeHeaders);
-            ```
-            ->
-            ```
-            this.client.subscribe(`/exchange/${this.exchangeName}/sbp-bp-[your name]-[your birth year]-[your birth day]`, this.onMessage.bind(this), subscribeHeaders);
-            ```
+    - Modify "clientv1/.env.production"
+        - Set the "VUE_APP_RABBITMQ_QUEUE" value to the same value you used for "rmqBrowserPushRoute" in the prior step
+    - Set the same value in "clientv1/.env.development"
     - Commit your changes and push to git
         ```
         $ git commit -m "update config"
@@ -201,7 +209,7 @@
         - Open the AWS console in a browser and login
         - Click the "Services" drop down and enter "EC2" in the search edit box - then click "EC2"
         - Click on "Load Balancers" in the menu on the left side
-        - Copy the load balancer URl corresponding to the stock quote publisher web application
+        - Copy the load balancer DNS name corresponding to the stock quote publisher web application
         - Paste the URL into a new browser window
         - When the page loads, enter a ticker, e.g. "IBM" in the ticker input box and then click the "Subscribe" button - you should see regular quote updates in the browser
 7. Test the build/deploy process
@@ -236,3 +244,174 @@
     - Check your AWS account to make sure all resources have been cleaned up
 ## TODO
 - How to run the application locally
+
+
+## IAM policies
+- ec2-admin-passrole
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::948032566234:role/ec2-admin"
+        }
+    ]
+}
+```
+- eks-admin
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:AttachInstances",
+                "autoscaling:CreateAutoScalingGroup",
+                "autoscaling:CreateLaunchConfiguration",
+                "autoscaling:CreateOrUpdateTags",
+                "autoscaling:DeleteAutoScalingGroup",
+                "autoscaling:DeleteLaunchConfiguration",
+                "autoscaling:DeleteTags",
+                "autoscaling:Describe*",
+                "autoscaling:DetachInstances",
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:UpdateAutoScalingGroup",
+                "autoscaling:SuspendProcesses",
+                "ec2:AllocateAddress",
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:Associate*",
+                "ec2:AttachInternetGateway",
+                "ec2:AttachNetworkInterface",
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:CreateDefaultSubnet",
+                "ec2:CreateDhcpOptions",
+                "ec2:CreateEgressOnlyInternetGateway",
+                "ec2:CreateInternetGateway",
+                "ec2:CreateNatGateway",
+                "ec2:CreateNetworkInterface",
+                "ec2:CreateRoute",
+                "ec2:CreateRouteTable",
+                "ec2:CreateSecurityGroup",
+                "ec2:CreateSubnet",
+                "ec2:CreateTags",
+                "ec2:CreateVolume",
+                "ec2:CreateVpc",
+                "ec2:CreateVpcEndpoint",
+                "ec2:DeleteDhcpOptions",
+                "ec2:DeleteEgressOnlyInternetGateway",
+                "ec2:DeleteInternetGateway",
+                "ec2:DeleteNatGateway",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DeleteRoute",
+                "ec2:DeleteRouteTable",
+                "ec2:DeleteSecurityGroup",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteTags",
+                "ec2:DeleteVolume",
+                "ec2:DeleteVpc",
+                "ec2:DeleteVpnGateway",
+                "ec2:Describe*",
+                "ec2:DetachInternetGateway",
+                "ec2:DetachNetworkInterface",
+                "ec2:DetachVolume",
+                "ec2:Disassociate*",
+                "ec2:ModifySubnetAttribute",
+                "ec2:ModifyVpcAttribute",
+                "ec2:ModifyVpcEndpoint",
+                "ec2:ReleaseAddress",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:UpdateSecurityGroupRuleDescriptionsEgress",
+                "ec2:UpdateSecurityGroupRuleDescriptionsIngress",
+                "ec2:CreateLaunchTemplate",
+                "ec2:CreateLaunchTemplateVersion",
+                "ec2:DeleteLaunchTemplate",
+                "ec2:DeleteLaunchTemplateVersions",
+                "ec2:DescribeLaunchTemplates",
+                "ec2:DescribeLaunchTemplateVersions",
+                "ec2:GetLaunchTemplateData",
+                "ec2:ModifyLaunchTemplate",
+                "ec2:RunInstances",
+                "eks:CreateCluster",
+                "eks:DeleteCluster",
+                "eks:DescribeCluster",
+                "eks:ListClusters",
+                "eks:UpdateClusterConfig",
+                "eks:UpdateClusterVersion",
+                "eks:DescribeUpdate",
+                "eks:TagResource",
+                "eks:UntagResource",
+                "eks:ListTagsForResource",
+                "eks:CreateFargateProfile",
+                "eks:DeleteFargateProfile",
+                "eks:DescribeFargateProfile",
+                "eks:ListFargateProfiles",
+                "eks:CreateNodegroup",
+                "eks:DeleteNodegroup",
+                "eks:DescribeNodegroup",
+                "eks:ListNodegroups",
+                "eks:UpdateNodegroupConfig",
+                "eks:UpdateNodegroupVersion",
+                "iam:AddRoleToInstanceProfile",
+                "iam:AttachRolePolicy",
+                "iam:CreateInstanceProfile",
+                "iam:CreateOpenIDConnectProvider",
+                "iam:CreateServiceLinkedRole",
+                "iam:CreatePolicy",
+                "iam:CreatePolicyVersion",
+                "iam:CreateRole",
+                "iam:DeleteInstanceProfile",
+                "iam:DeleteOpenIDConnectProvider",
+                "iam:DeletePolicy",
+                "iam:DeletePolicyVersion",
+                "iam:DeleteRole",
+                "iam:DeleteRolePolicy",
+                "iam:DeleteServiceLinkedRole",
+                "iam:DetachRolePolicy",
+                "iam:GetInstanceProfile",
+                "iam:GetOpenIDConnectProvider",
+                "iam:GetPolicy",
+                "iam:GetPolicyVersion",
+                "iam:GetRole",
+                "iam:GetRolePolicy",
+                "iam:List*",
+                "iam:PassRole",
+                "iam:PutRolePolicy",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:TagInstanceProfile",
+                "iam:TagPolicy",
+                "iam:TagRole",
+                "iam:UntagRole",
+                "iam:UpdateAssumeRolePolicy",
+                "logs:CreateLogGroup",
+                "logs:DescribeLogGroups",
+                "logs:DeleteLogGroup",
+                "logs:ListTagsLogGroup",
+                "logs:PutRetentionPolicy",
+                "kms:CreateAlias",
+                "kms:CreateGrant",
+                "kms:CreateKey",
+                "kms:DeleteAlias",
+                "kms:DescribeKey",
+                "kms:GetKeyPolicy",
+                "kms:GetKeyRotationStatus",
+                "kms:ListAliases",
+                "kms:ListResourceTags",
+                "kms:ScheduleKeyDeletion"
+            ],
+            "Resource": "*"
+        }
+    ]
+}```
