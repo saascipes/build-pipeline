@@ -1,4 +1,10 @@
 #!/usr/bin/env sh
+cd clientv1
+
+npm run build
+
+cd ..
+
 docker build --target client -f deploy/docker/api/Dockerfile -t spa_build_pipeline_client .
 docker tag spa_build_pipeline_client $2/spa_build_pipeline_client:$1
 docker push $2/spa_build_pipeline_client:$1

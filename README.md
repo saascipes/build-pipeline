@@ -151,9 +151,7 @@
         $ git commit -m "update config"
         $ git push
         ```
-
-## Install
-1. Create and install SaasGlue API access credentials in GitHub
+6. Create and install SaasGlue API access credentials in GitHub
     - Log in to the [SaasGlue web console](https://console.saasglue.com)
     - Click your login name in the upper right hand corner and click "Access Keys"
     - Click the "User Access Keys" tab
@@ -167,7 +165,9 @@
     - Copy the access key id
     - Create a GitHub secret named "SG_ACCESS_KEY_ID" in your spa-build-pipeline repo with the SaasGlue access key id
     - Create a GitHub secret named "SG_ACCESS_SECRET" in your spa-build-pipeline repo with the SaasGlue access key secret
-2. Build the application
+
+## Install
+1. Build the application
     - From the project root folder run
     ```
     $ npm i
@@ -176,19 +176,19 @@
     ```
     $ npm run build
     ```
-3. Authenticate your local Docker client to your ECR registry
+2. Authenticate your local Docker client to your ECR registry
     - Log in to the AWS [console](https://us-east-2.console.aws.amazon.com)
     - Enter "ECR" in the "Search for services..." search box at the top of the console and select "Elastic Container Registry"
     - Select any one of the repositories (there should be 4) by clicking the radio button next to the repository name
     - Click the "View push commands" button
     - Follow the instructions in step 1, "Retrieve an authentication token..." - run the command from a terminal window
-4. Build and deploy docker images (replace [aws ecr repo uri] with your ecr uri)
+3. Build and deploy docker images (replace [aws ecr repo uri] with your ecr uri)
     ```
     $ ./build_agent_docker_image_aws.sh v0.1 [aws ecr repo uri]
     $ ./build_api_docker_image_aws.sh v0.1 [aws ecr repo uri]
     $ ./build_stock_quote_publisher_image_aws.sh v0.1 [aws ecr repo uri]
     ```
-5. Set SaasGlue jobs Runtime Variables
+4. Set SaasGlue jobs Runtime Variables
     - These are key value pairs associated with each job 
     - To enter runtime variables for a job, click the job name in the "Designer" view and then click the "Runtime Variables" tab - if there is an existing runtime variable with the given key, click "unmask" and enter the new value in the edit box and hit "enter" - otherwise enter the key/value pair in the edit boxes at the bottom of the grid and then click "Add Runtime Variable"
         - Init Build Pipeline Demo job
@@ -208,7 +208,7 @@
             GIT_REPO_NAME = spa_build_pipeline
             instances = [the id of the ec2 instance you set up previously to run the SaasGlue Agent which will create the production/build environments, e.g. i-035d9ea161fab5073]
             docker_tag = v0.2
-6. Run the SaasGlue job to deploy the production application
+5. Run the SaasGlue job to deploy the production application
     - Log in to the SaasGlue web [console](https://console.saasglue.com)
     - Click "Designer" in the menu bar
     - Select "Init Build Pipeline Demo"
@@ -221,7 +221,7 @@
         - Copy the load balancer DNS name corresponding to the stock quote publisher web application
         - Paste the URL into a new browser window
         - When the page loads, enter a ticker, e.g. "IBM" in the ticker input box and then click the "Subscribe" button - you should see regular quote updates in the browser
-7. Test the build/deploy process
+6. Test the build/deploy process
     - Modify the "server/src/workers/StockQuotePublisher.py" code on your local machine
         - Comment line 258
         - Uncomment lines 260 to 262
@@ -234,7 +234,7 @@
     - Click on the "Monitor" link to the left of the "Build Stock Quotes Publisher" job with status "Running"
     - You should see 3 tasks - you can click on the task name to see details related to the running task
     - When all 3 tasks have completed, go back to your stock quote publisher web application and you should see the new weighted price (wpx) field delivered with new quotes
-8. Tear down the stock quote publisher application environment
+7. Tear down the stock quote publisher application environment
     - Open the SaasGlue web [console](https://console.saasglue.com)
     - Click "Monitor" in the menu bar
     - Click on the "Monitor" link to the left of the most recent "Build Stock Quotes Publisher" job with status "Completed"
