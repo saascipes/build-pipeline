@@ -115,7 +115,7 @@
                 NumInstances = 1 
                 KeyName = [aws ec2 key pair]
                 InstanceType = t3.small
-                IAMRole = [the name of the iam user you created in step 2] 
+                IAMRole = eks-admin
                 ImageId = ami-0b59bfac6be064b78
 4. Run the "SPA Build Pipeline Init AWS" SaasGlue job - this job will create an ec2 instance to run the SaasGlue agent and create the ECR repositories for the application Docker images
     - Log in to the SaasGlue web [console](https://console.saasglue.com)
