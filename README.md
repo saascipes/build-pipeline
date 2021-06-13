@@ -100,6 +100,7 @@
             - Click the "Runtime Variables" tab 
             - Enter the following key/value pairs - if there is an existing runtime variable with the given key, click "unmask" and enter the new value in the input box and hit "enter" - otherwise enter the key/value pair in the input boxes at the bottom of the grid and then click "Add Runtime Variable"
         
+                TERRAFORM_VERSION = 0.14.0
                 workingdir = /home/ec2-user 
                 tags = {"terraform":"true"} 
                 sgTeamId = [your team id - from previous step]
