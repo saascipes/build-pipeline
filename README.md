@@ -31,7 +31,7 @@
     - Create an IAM policy named "eks-admin" (see end for json to use to create the policy) - https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_managed-policies.html#step1-create-policy
     - Create an IAM user (pick whatever name you want) - https://docs.aws.amazon.com/rekognition/latest/dg/setting-up.html
         - Assign permissions to the user
-            - Attach the ec2-admin policy you created previously
+            - Attach the ec2-admin-passrole policy you created previously
             - Attach "AmazonEC2FullAccess" AWS managed policy
             - Attach "AmazonS3FullAccess" AWS managed policy
         - Create an access key

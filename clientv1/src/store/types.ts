@@ -33,62 +33,15 @@ export interface CoreState {
 };
 
 export enum ModelType {
-  job = 'job',
-  jobDef = 'jobDef',
-  taskdef = 'taskDef',
-  stepDef = 'stepDef',
-  team = 'team',
-  alert = 'alert',
-  agent = 'agent',
   quote = 'quote'
 };
 
 export enum StoreType {
-  JobStore = 'jobStore',
-  TaskStore = 'taskStore',
-  StepStore = 'stepStore',
-  TaskOutcomeStore = 'taskOutcomeStore',
-  StepOutcomeStore = 'stepOutcomeStore',
-  JobDefStore = 'jobDefStore',
-  TaskDefStore = 'taskDefStore',
-  StepDefStore = 'stepDefStore',
-  TeamStore = 'teamStore',
-  AlertStore = 'alertStore',
-  AgentStore = 'agentStore',
-  ScriptNameStore = 'scriptNameStore',
-  ScriptStore = 'scriptStore',
-  ScriptShadowStore = 'userScriptShadowCopyStore',
-  ScheduleStore = 'scheduleStore',
-  TeamVariableStore = 'teamVariableStore',
-  ArtifactStore = 'artifactStore',
-  InvoiceStore = 'invoiceStore',
-  PaymentTransactionStore = 'paymentTransactionStore',
-  UserStore = 'userStore',
-  PaymentMethodStore = 'paymentMethodStore',
   QuoteStore = 'quoteStore',
   StockSubscriptionStore = 'stockSubscriptionStore'
 }
 
 export enum ModelBaseUrlType {
-  job = 'job',
-  task = 'task',
-  step = 'step',
-  taskOutcome = 'taskoutcome',
-  stepOutcome = 'stepoutcome',
-  jobDef = 'jobdef',
-  taskdef = 'taskdef',
-  stepdef = 'stepdef',
-  team = 'team',
-  agent = 'agent',
-  script = 'script',
-  scriptShadow = 'scriptshadow',
-  schedule = 'schedule',
-  teamVar = 'teamvar',
-  artifact = 'artifact',
-  invoice = 'invoice',
-  paymentTransaction = 'paymenttransaction',
-  user = 'user',
-  paymentMethod = 'paymentMethod',
   quote = 'quote',
   stockSubscription = 'subscription'
 }
